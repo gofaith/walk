@@ -9,8 +9,8 @@ import (
 )
 
 import (
-	"github.com/lxn/walk"
-	. "github.com/lxn/walk/declarative"
+	"github.com/gofaith/walk"
+	. "github.com/gofaith/walk/declarative"
 )
 
 func main() {

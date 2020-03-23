@@ -7,7 +7,7 @@
 package declarative
 
 import (
-	"github.com/lxn/walk"
+	"github.com/gofaith/walk"
 )
 
 type Font struct {

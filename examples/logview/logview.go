@@ -10,7 +10,7 @@ import (
 )
 
 import (
-	"github.com/lxn/walk"
+	"github.com/gofaith/walk"
 	"github.com/lxn/win"
 )
 

@@ -9,7 +9,7 @@ package declarative
 import (
 	"errors"
 
-	"github.com/lxn/walk"
+	"github.com/gofaith/walk"
 )
 
 type Orientation byte
