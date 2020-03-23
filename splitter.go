@@ -424,6 +424,9 @@ func (s *Splitter) onInsertedWidget(index int, widget Widget) (err error) {
 						msep := minSizeEffective(createLayoutItemForWidget(prev))
 
 						next := closestVisibleWidget(handleIndex, 1)
+						if next==nil{
+							return
+						}
 						bn := next.BoundsPixels()
 						msen := minSizeEffective(createLayoutItemForWidget(next))
 
@@ -493,6 +496,9 @@ func (s *Splitter) onInsertedWidget(index int, widget Widget) (err error) {
 						handleIndex := s.children.Index(dragHandle)
 						prev := closestVisibleWidget(handleIndex, -1)
 						next := closestVisibleWidget(handleIndex, 1)
+						if next == nil {
+							return
+						}
 
 						s.draggedHandle = nil
 						dragHandle.SetBackground(NullBrush())
