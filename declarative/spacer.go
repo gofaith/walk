@@ -26,7 +26,7 @@ type HSpacer struct {
 	StretchFactor int
 
 	// Spacer
-
+	AssignTo          **walk.Spacer
 	GreedyLocallyOnly bool
 	Size              int
 }
@@ -44,6 +44,10 @@ func (hs HSpacer) Create(builder *Builder) (err error) {
 		GreedyLocallyOnly: hs.GreedyLocallyOnly,
 	}); err != nil {
 		return
+	}
+
+	if hs.AssignTo != nil {
+		*hs.AssignTo = w
 	}
 
 	return builder.InitWidget(hs, w, nil)
@@ -65,7 +69,7 @@ type VSpacer struct {
 	StretchFactor int
 
 	// Spacer
-
+	AssignTo          **walk.Spacer
 	GreedyLocallyOnly bool
 	Size              int
 }
@@ -83,6 +87,10 @@ func (vs VSpacer) Create(builder *Builder) (err error) {
 		GreedyLocallyOnly: vs.GreedyLocallyOnly,
 	}); err != nil {
 		return
+	}
+
+	if vs.AssignTo != nil {
+		*vs.AssignTo = w
 	}
 
 	return builder.InitWidget(vs, w, nil)
