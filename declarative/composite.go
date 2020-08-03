@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 	"github.com/lxn/win"
 )
@@ -59,6 +60,9 @@ type Composite struct {
 	Border      bool
 	Expressions func() map[string]walk.Expression
 	Functions   map[string]func(args ...interface{}) (interface{}, error)
+
+	BindVisible   *livedata.Bool
+	BindInvisible *livedata.Bool
 }
 
 func (c Composite) Create(builder *Builder) error {
@@ -93,6 +97,16 @@ func (c Composite) Create(builder *Builder) error {
 			}
 		}
 
+		if c.BindVisible != nil {
+			c.BindVisible.ObserveForever(func(b bool) {
+				w.SetVisible(b)
+			})
+		}
+		if c.BindInvisible != nil {
+			c.BindInvisible.ObserveForever(func(b bool) {
+				w.SetVisible(!b)
+			})
+		}
 		return nil
 	})
 }

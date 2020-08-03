@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -56,6 +57,9 @@ type Dialog struct {
 	CancelButton  **walk.PushButton
 	DefaultButton **walk.PushButton
 	FixedSize     bool
+
+	InfoTitle string
+	BindInfo  *livedata.String
 }
 
 func (d Dialog) Create(owner walk.Form) error {
@@ -125,6 +129,13 @@ func (d Dialog) Create(owner walk.Form) error {
 		return err
 	}
 
+	if d.BindInfo != nil {
+		d.BindInfo.ObserveForever(func(s string) {
+			if s != "" {
+				walk.MsgBox(w, d.InfoTitle, s, walk.MsgBoxIconInformation)
+			}
+		})
+	}
 	return builder.InitWidget(fi, w, func() error {
 		if d.Size.Width > 0 && d.Size.Height > 0 {
 			if err := w.SetSize(d.Size.toW()); err != nil {

@@ -6,7 +6,10 @@
 
 package declarative
 
-import "github.com/gofaith/walk"
+import (
+	"github.com/StevenZack/livedata"
+	"github.com/gofaith/walk"
+)
 
 type MainWindow struct {
 	// Window
@@ -57,6 +60,9 @@ type MainWindow struct {
 	SuspendedUntilRun bool
 	ToolBar           ToolBar
 	ToolBarItems      []MenuItem // Deprecated: use ToolBar instead
+
+	InfoTitle string
+	BindInfo  *livedata.String
 }
 
 func (mw MainWindow) Create() error {
@@ -115,6 +121,14 @@ func (mw MainWindow) Create() error {
 
 	if err := w.SetRightToLeftLayout(mw.RightToLeftLayout); err != nil {
 		return err
+	}
+
+	if mw.BindInfo != nil {
+		mw.BindInfo.ObserveForever(func(str string) {
+			if str != "" {
+				walk.MsgBox(w, mw.InfoTitle, str, walk.MsgBoxIconInformation)
+			}
+		})
 	}
 
 	return builder.InitWidget(fi, w, func() error {

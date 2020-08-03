@@ -8,9 +8,8 @@ package declarative
 
 import (
 	"errors"
-)
 
-import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -65,6 +64,9 @@ type ComboBox struct {
 	OnTextChanged         walk.EventHandler
 	Precision             int
 	Value                 Property
+
+	BindData      func() ([]string, *livedata.Bool)
+	BindSelection *livedata.Int
 }
 
 func (cb ComboBox) Create(builder *Builder) error {
@@ -89,6 +91,30 @@ func (cb ComboBox) Create(builder *Builder) error {
 		*cb.AssignTo = w
 	}
 
+	if cb.BindData != nil {
+		model, b := cb.BindData()
+		w.SetModel(model)
+		if b != nil {
+			b.ObserveForever(func(bb bool) {
+				if bb {
+					model, _ := cb.BindData()
+					w.SetModel(model)
+				}
+			})
+		}
+	}
+
+	if cb.BindSelection != nil {
+		if cb.BindData == nil {
+			panic("BindSelection depends on BindData. Please set BindData")
+		}
+		cb.BindSelection.ObserveForever(func(i int) {
+			model, _ := cb.BindData()
+			if len(model) > i && i > -1 {
+				w.SetCurrentIndex(i)
+			}
+		})
+	}
 	return builder.InitWidget(cb, w, func() error {
 		w.SetPersistent(cb.Persistent)
 		w.SetFormat(cb.Format)

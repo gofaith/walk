@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -56,6 +57,9 @@ type PushButton struct {
 
 	AssignTo       **walk.PushButton
 	ImageAboveText bool
+
+	BindVisible *livedata.Bool
+	BindEnable  *livedata.Bool
 }
 
 func (pb PushButton) Create(builder *Builder) error {
@@ -68,6 +72,17 @@ func (pb PushButton) Create(builder *Builder) error {
 		*pb.AssignTo = w
 	}
 
+	if pb.BindVisible != nil {
+		pb.BindVisible.ObserveForever(func(b bool) {
+			w.SetVisible(b)
+		})
+	}
+
+	if pb.BindEnable != nil {
+		pb.BindEnable.ObserveForever(func(b bool) {
+			w.SetEnabled(b)
+		})
+	}
 	return builder.InitWidget(pb, w, func() error {
 		if err := w.SetImageAboveText(pb.ImageAboveText); err != nil {
 			return err

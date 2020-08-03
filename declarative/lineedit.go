@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -67,6 +68,7 @@ type LineEdit struct {
 	Text              Property
 	TextAlignment     Alignment1D
 	TextColor         walk.Color
+	BindText          *livedata.String
 }
 
 func (le LineEdit) Create(builder *Builder) error {
@@ -79,6 +81,19 @@ func (le LineEdit) Create(builder *Builder) error {
 		*le.AssignTo = w
 	}
 
+	if le.BindText != nil {
+		w.TextChanged().Attach(func() {
+			str := w.Text()
+			if str != le.BindText.Get() {
+				le.BindText.Post(str)
+			}
+		})
+		le.BindText.ObserveForever(func(str string) {
+			if w.Text() != str {
+				w.SetText(str)
+			}
+		})
+	}
 	return builder.InitWidget(le, w, func() error {
 		w.SetTextColor(le.TextColor)
 

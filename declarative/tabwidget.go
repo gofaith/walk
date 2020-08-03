@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -53,6 +54,10 @@ type TabWidget struct {
 	ContentMarginsZero    bool
 	OnCurrentIndexChanged walk.EventHandler
 	Pages                 []TabPage
+
+	BindTab       *livedata.Int
+	BindVisible   *livedata.Bool
+	BindInvisible *livedata.Bool
 }
 
 func (tw TabWidget) Create(builder *Builder) error {
@@ -65,6 +70,21 @@ func (tw TabWidget) Create(builder *Builder) error {
 		*tw.AssignTo = w
 	}
 
+	if tw.BindTab != nil {
+		tw.BindTab.ObserveForever(func(i int) {
+			if i < 0 || i >= len(tw.Pages) || w.CurrentIndex() == i {
+				return
+			}
+			w.SetCurrentIndex(i)
+		})
+		tw.OnCurrentIndexChanged = func() {
+			i := w.CurrentIndex()
+			if tw.BindTab.Get() == i {
+				return
+			}
+			tw.BindTab.Post(i)
+		}
+	}
 	return builder.InitWidget(tw, w, func() error {
 		for _, tp := range tw.Pages {
 			var wp *walk.TabPage
@@ -89,6 +109,20 @@ func (tw TabWidget) Create(builder *Builder) error {
 			w.CurrentIndexChanged().Attach(tw.OnCurrentIndexChanged)
 		}
 
+		if tw.BindTab != nil {
+			w.SetCurrentIndex(tw.BindTab.Get())
+		}
+
+		if tw.BindVisible != nil {
+			tw.BindVisible.ObserveForever(func(b bool) {
+				w.SetVisible(b)
+			})
+		}
+		if tw.BindInvisible != nil {
+			tw.BindInvisible.ObserveForever(func(b bool) {
+				w.SetVisible(!b)
+			})
+		}
 		return nil
 	})
 }

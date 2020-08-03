@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -51,6 +52,8 @@ type LinkLabel struct {
 	AssignTo        **walk.LinkLabel
 	OnLinkActivated walk.LinkLabelLinkEventHandler
 	Text            Property
+
+	BindText *livedata.String
 }
 
 func (ll LinkLabel) Create(builder *Builder) error {
@@ -63,6 +66,11 @@ func (ll LinkLabel) Create(builder *Builder) error {
 		*ll.AssignTo = w
 	}
 
+	if ll.BindText != nil {
+		ll.BindText.ObserveForever(func(str string) {
+			w.SetText(str)
+		})
+	}
 	return builder.InitWidget(ll, w, func() error {
 		if ll.OnLinkActivated != nil {
 			w.LinkActivated().Attach(ll.OnLinkActivated)

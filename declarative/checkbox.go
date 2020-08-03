@@ -7,6 +7,7 @@
 package declarative
 
 import (
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -60,6 +61,8 @@ type CheckBox struct {
 	OnCheckStateChanged walk.EventHandler
 	TextOnLeftSide      bool
 	Tristate            bool
+
+	BindCheck *livedata.Bool
 }
 
 func (cb CheckBox) Create(builder *Builder) error {
@@ -70,6 +73,15 @@ func (cb CheckBox) Create(builder *Builder) error {
 
 	if cb.AssignTo != nil {
 		*cb.AssignTo = w
+	}
+
+	if cb.BindCheck != nil {
+		cb.BindCheck.ObserveForever(func(b bool) {
+			w.SetChecked(b)
+		})
+		w.CheckedChanged().Attach(func() {
+			cb.BindCheck.Post(w.Checked())
+		})
 	}
 
 	return builder.InitWidget(cb, w, func() error {

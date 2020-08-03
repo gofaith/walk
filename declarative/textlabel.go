@@ -7,6 +7,9 @@
 package declarative
 
 import (
+	"strconv"
+
+	"github.com/StevenZack/livedata"
 	"github.com/gofaith/walk"
 )
 
@@ -70,6 +73,9 @@ type TextLabel struct {
 	AssignTo      **walk.TextLabel
 	TextAlignment Alignment2D
 	Text          Property
+
+	BindText    *livedata.String
+	BindTextInt *livedata.Int
 }
 
 func (tl TextLabel) Create(builder *Builder) error {
@@ -89,6 +95,17 @@ func (tl TextLabel) Create(builder *Builder) error {
 			return err
 		}
 
+		if tl.BindText != nil {
+			tl.BindText.ObserveForever(func(str string) {
+				w.SetText(str)
+			})
+		}
+
+		if tl.BindTextInt != nil {
+			tl.BindTextInt.ObserveForever(func(i int) {
+				w.SetText(strconv.Itoa(i))
+			})
+		}
 		return nil
 	})
 }
